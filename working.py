@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.params import Path
-# from pydantic.utils import Representation, is_valid_field
 from typing import Optional
 from pydantic import BaseModel
 
@@ -13,13 +12,7 @@ class Ptem(BaseModel):
     brand: Optional[str] = None
 
 
-inventory = {
-    1: {
-        'name': 'Milk',
-        'price': 3.99,
-        'brand': 'Amul'
-    }
-}
+inventory = {}
 
 
 @app.get('/')
@@ -41,14 +34,14 @@ class Item:
 
 
 @app.get('/get-item/{item_id}')
-def get_item(item_id: int = Path(None, description="The ID of Item needs to be an Integer", gt=0, lt=2)):
+def get_item(item_id: int = Path(None, description="The ID of Item needs to be an Integer")):
     return inventory[item_id]
 
 
-@app.get('/get-by-name/{item_id}')
-def get_item(*, item_id: int, name: Optional[str] = None, test: int,):
+@app.get('/get-by-name/')
+def get_item(name:str):
     for item_id in inventory:
-        if inventory[item_id]['name'] == name:
+        if inventory[item_id].name == name:
             return inventory[item_id]
     return {'Data': 'Not Found'}
 
@@ -57,7 +50,6 @@ def get_item(*, item_id: int, name: Optional[str] = None, test: int,):
 def create_item(item_id: int, item: Ptem):
     if item_id in inventory:
         return {"Error": "item ID already exists"}
-    inventory[item_id] = {"name": item.name,
-                          "brand": item.brand, "price": item.price}
+    inventory[item_id] = item
     print(inventory)
     return inventory[item_id]
